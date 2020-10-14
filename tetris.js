@@ -76,9 +76,9 @@ var score;
 var currentBlockX;
 var currentBlockY;
 var currentBlockT;
-var timer = 1000/(level+1);
+var timer = 10000/(level+1);
 var gameOn=true;
-var interval = setInterval(dropByTimer(), timer);
+var interval;
 /*
 * Main game function, gives random block after block is set
 */
@@ -90,62 +90,48 @@ function newBlock(){
 }
 
 drawMatrix(newBlock(),5,5,'white')
+if(currentBlockT!==null){
+  resetTimer();
+  console.log("tiemr");
+}
 //drawMatrix(gameMatrix,0,0,'white')
 /*
 * called everytime the counter ends, checks if the block should be set or go down
 */
 function dropByTimer(){
   if(!checkColisionDown()){
-    dropDown();
+    moveDown();
   }
   //setBlock();
   //resetTimer();
 }
 /*
-*
-*/
-function dropDown(){
-  currentBlockX=currentBlockX+1;
-}
-/*
-*
+*moves blocks right, checks nothing
 */
 function moveRight(){
-
-
-/*  currentBlockT.map((filas,indice)=>{
-    filas.map((celda,jndice)=>{
-
-      console.log(currentBlockX);
-      console.log(currentBlockY);
-      gameMatrix[currentBlockX][currentBlockY]=0;
-
-
-    })
-  });
-  updateBoard()
-  currentBlockY=currentBlockY+1;
-  currentBlockT.map((filas,indice)=>{
-    filas.map((celda,jndice)=>{
-
-      console.log(indice);
-      gameMatrix[currentBlockX+indice][currentBlockY+jndice]=celda;
-
-
-    })
-  });*/
   drawMatrix(currentBlockT, currentBlockX,currentBlockY,"black");
   currentBlockX=currentBlockX+1
   drawMatrix(currentBlockT, currentBlockX,currentBlockY, "white");
   drawMatrix(gameMatrix, 0,0);
 }
 /*
-*
+* moves block right, checks nothing
 */
 function moveLeft(){
-  currentBlockY=currentBlockY-1;
+  drawMatrix(currentBlockT, currentBlockX,currentBlockY,"black");
+  currentBlockX=currentBlockX-1
+  drawMatrix(currentBlockT, currentBlockX,currentBlockY, "white");
+  drawMatrix(gameMatrix, 0,0);
 }
-
+/*
+* moves block down, checks nothing
+*/
+function moveDown(){
+  drawMatrix(currentBlockT, currentBlockX,currentBlockY,"black");
+  currentBlockY=currentBlockY+1
+  drawMatrix(currentBlockT, currentBlockX,currentBlockY, "white");
+  drawMatrix(gameMatrix, 0,0);
+}
 
 /*
 * Updates timer and restarts interval
@@ -179,11 +165,15 @@ function colisionSides(direction){
 * Checks if there a block down, returns true if thats the case
 */
 function checkColisionDown(){
-  if(currentBlockX+1!==0|| currentBlockX+1!==23){
-    return false;
-  }else{
+  if(gameMatrix[currentBlockX][currentBlockY+1]==1){
     return true;
+  }else{
+    return false;
   }
+}
+
+function checkColision(block, gMatrix){
+  return false
 }
 
 /*
@@ -198,21 +188,29 @@ function updateBoard(){
 document.addEventListener('keydown', event => {
     if (event.keyCode === 37) {
       //left
-        console.log(37);
+        moveLeft();
+        updateBoard();
     } else if (event.keyCode === 39) {
       //if(colisionSides("right")){
-        console.log(39);
           moveRight();
           updateBoard();
       //}
     } else if (event.keyCode === 40) {
         //down
-        console.log(40);
         dropByTimer();
     } else if (event.keyCode === 81) {
+      //q???
         console.log(81);
-    } else if (event.keyCode === 87 || event.keyCode === 38) {
-        rotate(event.keyCode);
+    } else if (event.keyCode === 38||event.keyCode === 18) {
+        console.log("hola");
+        if(true){
+          drawMatrix(currentBlockT,currentBlockX,currentBlockY,"black");
+          currentBlockT=rotate(currentBlockT, 1);
+          drawMatrix(currentBlockT,currentBlockX,currentBlockY,"white");
+        }else{
+
+        }
+        updateBoard();
     }
 });
 
@@ -254,8 +252,7 @@ function rotate(matrix){
       newMatrix.push(row);
     }
   return newMatrix;
-};
-
+}
 
 function drawMatrix(matrix, xi, yi, color){
   matrix.forEach((row, y) =>{
