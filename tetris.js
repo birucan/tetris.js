@@ -49,11 +49,11 @@ var gameMatrix =[
 [0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0],
-[0,0,0,0,0,0,0,0,0,0],
+[0,0,0,0,0,0,0,0,1,0],
+[0,0,0,0,0,0,0,0,1,0],
+[0,0,0,0,0,0,0,0,1,0],
+[0,0,0,0,0,0,0,0,1,0],
+[0,0,0,0,0,0,0,0,1,0],
 [0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0],
 [0,0,0,0,0,0,0,0,0,0],
@@ -76,7 +76,7 @@ var score;
 var currentBlockX;
 var currentBlockY;
 var currentBlockT;
-var timer = 10000/(level+1);
+var timer = 1000000/(level+1);
 var gameOn=true;
 var interval;
 /*
@@ -99,11 +99,8 @@ if(currentBlockT!==null){
 * called everytime the counter ends, checks if the block should be set or go down
 */
 function dropByTimer(){
-  if(!checkColisionDown()){
     moveDown();
-  }
-  //setBlock();
-  //resetTimer();
+    //resetTimer();
 }
 /*
 *moves blocks right, checks nothing
@@ -137,42 +134,23 @@ function moveDown(){
 * Updates timer and restarts interval
 */
 function resetTimer(){
-  timer = 1000/(level+1);
+  timer = 1000000/(level+1);
   clearInterval(interval);
   interval = setInterval(dropByTimer(), timer);
 }
 /*
-* With left or right input checks colision, if true theres a block or wall blocking movement
+*Checks collision between block, gMatrix in cX/cY, returns true if there is colision
 */
-function colisionSides(direction){
-  if(direction=="right"){
-    if(currentBlockY+1!==0 || currentBlockY+1==9){
-      return false;
-    }else{
-      return true;
+function checkColision(block, gMatrix, cX, cY){
+  for (var a = 0; a < block.length; a++) {
+    for (var b = 0; b < block[a].length; b++) {
+      if(block[a][b]!==0 && gMatrix[cX+a][cY+b]!==0){
+
+        console.log("colision");
+        return true
+      }
     }
   }
-  if(direction=="left"){
-    if(currentBlockY-1!==0|| currentBlockY-1==0){
-      return false;
-    }else{
-      return true;
-    }
-  }
-}
-
-/*
-* Checks if there a block down, returns true if thats the case
-*/
-function checkColisionDown(){
-  if(gameMatrix[currentBlockX][currentBlockY+1]==1){
-    return true;
-  }else{
-    return false;
-  }
-}
-
-function checkColision(block, gMatrix){
   return false
 }
 
@@ -188,22 +166,28 @@ function updateBoard(){
 document.addEventListener('keydown', event => {
     if (event.keyCode === 37) {
       //left
+      if(!checkColision(currentBlockT, gameMatrix, currentBlockX-1, currentBlockY)){
         moveLeft();
         updateBoard();
+      }
     } else if (event.keyCode === 39) {
-      //if(colisionSides("right")){
-          moveRight();
-          updateBoard();
-      //}
+      //right
+      if(!checkColision(currentBlockT, gameMatrix, currentBlockX+1, currentBlockY)){
+        moveRight();
+        updateBoard();
+      }
     } else if (event.keyCode === 40) {
-        //down
+      if(!checkColision(currentBlockT, gameMatrix, currentBlockX, currentBlockY+1)){
         dropByTimer();
+        updateBoard();
+      }else{
+        //setBlock();
+      }
     } else if (event.keyCode === 81) {
-      //q???
+
         console.log(81);
     } else if (event.keyCode === 38||event.keyCode === 18) {
-        console.log("hola");
-        if(true){
+        if(!checkColision(rotate(currentBlockT),gameMatrix,currentBlockX, currentBlockY)){
           drawMatrix(currentBlockT,currentBlockX,currentBlockY,"black");
           currentBlockT=rotate(currentBlockT, 1);
           drawMatrix(currentBlockT,currentBlockX,currentBlockY,"white");
